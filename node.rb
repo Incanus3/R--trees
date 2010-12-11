@@ -44,7 +44,7 @@ class Node
     puts(name) # DEBUG
     file.write("\"#{name}\"[shape=record,label=\"")
     if leaf?
-      file.write(([@bounding_rect] + @data).map_meth(:export).join("|"))
+      file.write(([@bounding_rect] + @data).map(&:export).join("|"))
     else
       file.write(@bounding_rect.export)
     end
@@ -86,7 +86,7 @@ class Node
     if leaf?
       new_area = (@data + [rect]).reduce(:enlarge).area
     else
-      new_area = (@children.map_meth(:bounding_rect) +
+      new_area = (@children.map(&:bounding_rect) +
                   [rect]).reduce(:enlarge).area
     end
     new_area - @bounding_rect.area
@@ -97,7 +97,7 @@ class Node
   # method is called on parent
   def child_overlap (child,child_changed = child)
     child_changed.bounding_rect.
-      overlap_area_sum((@children - [child]).map_meth(:bounding_rect))
+      overlap_area_sum((@children - [child]).map(&:bounding_rect))
   end
 
   # computes enlargement of child node overlap with other children
@@ -124,7 +124,7 @@ class Node
     if leaf?
       @bounding_rect = @data.reduce(:enlarge)
     else
-      @bounding_rect = @children.map_meth(:bounding_rect).reduce(:enlarge)
+      @bounding_rect = @children.map(&:bounding_rect).reduce(:enlarge)
     end
   end
 
