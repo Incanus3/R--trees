@@ -61,6 +61,10 @@ class Rectangle
     rect_list.map {|rect| overlap_area(rect)}.reduce(:+)
   end
 
+  def Rectangle.bounding_box(rect_list)
+    rect_list.reduce(&:enlarge)
+  end
+
   private
   def reorganize (extents)
     extents.map { |(low,high)| (low < high) ? [low,high] : [high,low] }
