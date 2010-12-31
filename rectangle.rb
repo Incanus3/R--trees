@@ -43,7 +43,7 @@ class Rectangle
   end
 
   def export_rect(file,bounding_box = false)
-    color = bounding_box ? "(0,0,0) withpen pencircle scaled 2" :
+    color = bounding_box ? "(0,0,0) withpen pencircle scaled 1.5" :
       "(#{rand()/2 + 0.25},#{rand()/2 + 0.25},#{rand()/2 + 0.25})"
     file.puts("draw (#{@extents[0][0]}mm,#{@extents[1][0]}mm)--" +
               "(#{@extents[0][0]}mm,#{@extents[1][1]}mm)--" +

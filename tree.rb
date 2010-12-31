@@ -175,12 +175,3 @@ def step
   $counter += 1
 end
 
-=begin
-sourbor je treba nacist a spustit run (bez parametru), nebo opakovane spoustet step
-je vytvoren strom, nahodne je vygenerovano 100 obdelniku, ty jsou do stromu pridany
-po kazdem pridani je strom exportovan, run tedy vytvori soubory tree000.dot -
-tree099.dot, ty lze v linuxu hromadne prevest prikazem
-for i in `seq -w 0 99`; do dot -Tpng tree0${i}.dot -o tree0${i}.png; done
-v exportovanem stromu prvni bunka uzlu znazornuje bounding box, dalsi jsou datove
-prvky listu
-=end
