@@ -32,9 +32,19 @@ class Tree
     puts "tree exported" # DEBUG
   end
 
+  def export_rects(path)
+    puts "exporting rectangles..."
+    file = File.open(path,"w")
+    file.puts("beginfig(1);")
+    @root.export_rects(file)
+    file.puts("endfig;")
+    file.puts("end")
+    puts "rectangles exported"
+  end
+
   def to_s
     "#<#{self.class.name}:#{object_id} @min=#{@min} @max=#{max} " +
-    "@dimenion=#{@dimension}>"
+      "@dimenion=#{@dimension}>"
   end
 
   def inspect
@@ -54,9 +64,9 @@ class Tree
         (node.children.empty? ? "no children" :
          node.children.map {|child| child.object_id}.join(', '))
       if node.data.empty?
-        puts "  no data"
+        puts " no data"
       else
-        node.data.each {|data| puts "  " + data.to_s}
+        node.data.each {|data| puts " " + data.to_s}
       end
       puts
     end
@@ -76,7 +86,7 @@ class Tree
     area_enlargement2 = child2.box_area_enlargement(data)
     area1,area2 = child1.box_area,child2.box_area
 
-    val = case 
+    val = case
       when overlap_enlargement1 < overlap_enlargement2 : child1
       when overlap_enlargement1 > overlap_enlargement2 : child2
       else # overlap_enlargement1 == overlap_enlargement2
@@ -96,7 +106,7 @@ class Tree
     area_enlargement1 = node1.box_area_enlargement(data)
     area_enlargement2 = node2.box_area_enlargement(data)
     area1,area2 = node1.box_area,node2.box_area
-    area_enlargement1 < area_enlargement2 || 
+    area_enlargement1 < area_enlargement2 ||
       (area_enlargement1 == area_enlargement2 &&
        area1 < area2) ? node1 : node2
   end
@@ -131,7 +141,7 @@ def prepare
   100.times do
     x = rand(70)
     y = rand(70)
-    rect =  Rectangle.new([[x,x + rand(30)],[y,y + rand(30)]])
+    rect = Rectangle.new([[x,x + rand(30)],[y,y + rand(30)]])
     $rects << rect
   end
 end
@@ -147,7 +157,7 @@ def run
   puts
   puts "Tree created, printing"
   puts "Format: node -> children"
-  puts "  data"
+  puts " data"
   puts
 
   $tree.print_tree
@@ -168,7 +178,7 @@ end
 =begin
 sourbor je treba nacist a spustit run (bez parametru), nebo opakovane spoustet step
 je vytvoren strom, nahodne je vygenerovano 100 obdelniku, ty jsou do stromu pridany
-po kazdem pridani je strom exportovan, run tedy vytvori soubory tree000.dot - 
+po kazdem pridani je strom exportovan, run tedy vytvori soubory tree000.dot -
 tree099.dot, ty lze v linuxu hromadne prevest prikazem
 for i in `seq -w 0 99`; do dot -Tpng tree0${i}.dot -o tree0${i}.png; done
 v exportovanem stromu prvni bunka uzlu znazornuje bounding box, dalsi jsou datove

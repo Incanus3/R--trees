@@ -16,42 +16,30 @@ class Node
     @id = id # DEBUG
   end
 
-  def clone
-    # DEBUG "clone called on #{self}" # DEBUG
-    new_node = Node.new(@tree, @parent ? @parent.clone : nil)
-    new_node.children = @children.clone
-    new_node.data = @data.clone
-    new_node.update_box
-    new_node
-  end
-  
-  def check_overflow
-    # DEBUG "check_overflow called on #{self}"
+  def find_data (rect)
     if leaf?
-      split_data if @data.count > @tree.max
+      if @data.member?(rect)
+        return self
+      end
     else
-      split_children if @children.count > @tree.max
+      ret = nil
+      if @children.any? {|child| ret = child.find_data(rect)}
+        return ret
+      end
     end
-  end
-
-  def just_insert_data (rect)
-    return self if @data.member?(rect)
-    @data << rect
-    update_boxes
-    self
   end
 
   def insert_data (rect)
     # DEBUG "\ninsert_data(#{rect}) called on #{self}" # DEBUG
     just_insert_data (rect)
-    check_overflow
+    check_overflow()
     self
   end
 
   def delete_data (rect)
     @data.delete(rect)
     update_boxes()
-    # join() if @data.length < @tree.min
+    check_underfill()
   end
 
   def export (file,name = "1")
@@ -72,6 +60,15 @@ class Node
     end
   end
 
+  def export_rects(file)
+    @bounding_box.export_rect(file,true)
+    if leaf?
+      @data.each {|data| data.export_rect(file)}
+    else
+      @children.each {|child| child.export_rects(file)}
+    end
+  end
+
   def to_s
     "#<#{self.class.name}:#{object_id} @box=#{@bounding_box}>"
   end
@@ -82,6 +79,10 @@ class Node
 
   def leaf?
     @children.empty?
+  end
+
+  def root?
+    @parent.nil?
   end
   
   # returns nil if the node itself is leaf
@@ -137,7 +138,53 @@ class Node
 
   def add_child(node)
     just_add_child(node)
-    check_overflow
+    check_overflow()
+  end
+
+  def clone
+    # DEBUG "clone called on #{self}" # DEBUG
+    new_node = Node.new(@tree, @parent ? @parent.clone : nil)
+    new_node.children = @children.clone
+    new_node.data = @data.clone
+    new_node.update_box
+    new_node
+  end
+  
+  def check_overflow
+    # DEBUG "check_overflow called on #{self}"
+    if leaf?
+      split_data if @data.count > @tree.max
+    else
+      split_children if @children.count > @tree.max
+    end
+  end
+
+  def check_underfill
+    unless root?
+      delete if (leaf? ? @data.count : @children.count) < @tree.min
+    else
+      if @children.count == 1
+        @tree.root = @children[0]
+        @tree.root.parent = nil
+      end
+    end
+  end
+
+  def delete
+    @parent.delete_child(self)
+    @data.each {|data| @tree.insert(data)}
+  end
+
+  def delete_child(child)
+    @children.delete(child)
+    check_underfill()
+  end
+
+  def just_insert_data (rect)
+    return self if @data.member?(rect)
+    @data << rect
+    update_boxes
+    self
   end
 
 ################################################################################
